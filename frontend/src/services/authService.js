@@ -20,7 +20,8 @@ export async function fetchProfile(accessToken) {
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}))
-    throw new Error(data.error || 'Error al obtener perfil')
+    const detail = data.detail ? `: ${data.detail}` : ''
+    throw new Error(`${data.error || 'Error al obtener perfil'}${detail}`)
   }
 
   const data = await response.json()

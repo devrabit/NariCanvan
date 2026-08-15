@@ -1,5 +1,10 @@
 import { createDocument, queryCollection } from '../services/firestore.service.js'
-import { demoProjects, formatProject } from '../services/projects.service.js'
+import {
+  buildCreateProjectDocument,
+  demoProjects,
+  formatProject,
+  validateCreateProjectPayload,
+} from '../services/projects.service.js'
 
 export async function listProjects(req, res) {
   try {
@@ -47,5 +52,26 @@ export async function listProjects(req, res) {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al obtener proyectos' })
+  }
+}
+
+export async function createProject(req, res) {
+  try {
+    const validation = validateCreateProjectPayload(req.body)
+    if (!validation.ok) {
+      return res.status(400).json({ error: 'Datos inválidos', fields: validation.fields })
+    }
+
+    const document = buildCreateProjectDocument(req.user.uid, validation.data)
+    const created = await createDocument(req.accessToken, 'projects', document)
+
+    res.status(201).json({ project: formatProject(created) })
+  } catch (error) {
+    console.error(error)
+    const status = error.status === 403 ? 403 : 500
+    res.status(status).json({
+      error: status === 403 ? 'Sin permiso para crear el proyecto' : 'Error al crear el proyecto',
+      detail: error.message,
+    })
   }
 }

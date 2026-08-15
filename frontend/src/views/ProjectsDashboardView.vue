@@ -10,7 +10,7 @@
       <button
         type="button"
         class="bg-primary text-on-primary font-bold px-8 py-4 rounded-full flex items-center gap-2 pink-shadow bouncy hover:brightness-110 transition-all"
-        @click.prevent
+        @click="openCreateModal"
       >
         <span class="material-symbols-outlined">add</span>
         Nuevo Proyecto
@@ -42,25 +42,31 @@
       <p class="text-sm text-on-surface-variant">© 2024 NariBoard. Keep it sweet.</p>
     </footer>
 
-    <!-- FAB mobile -->
     <div class="md:hidden fixed bottom-6 right-6 z-50">
       <button
         type="button"
         class="w-16 h-16 bg-primary text-on-primary rounded-full pink-shadow flex items-center justify-center bouncy transition-transform"
-        @click.prevent
+        @click="openCreateModal"
       >
         <span class="material-symbols-outlined text-3xl">add</span>
       </button>
     </div>
+
+    <CreateProjectModal
+      :open="showCreateModal"
+      @close="showCreateModal = false"
+      @created="onProjectCreated"
+    />
   </DashboardLayout>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { fetchProjects } from '../services/projectsService'
 import DashboardLayout from '../components/DashboardLayout.vue'
 import ProjectCard from '../components/ProjectCard.vue'
+import CreateProjectModal from '../components/CreateProjectModal.vue'
 
 const authStore = useAuthStore()
 
@@ -68,6 +74,7 @@ const projects = ref([])
 const loading = ref(true)
 const error = ref(null)
 const search = ref('')
+const showCreateModal = ref(false)
 
 const filteredProjects = computed(() => {
   const term = search.value.toLowerCase().trim()
@@ -91,9 +98,13 @@ async function loadProjects() {
   }
 }
 
-watch(search, () => {
-  // Filtering is client-side via computed
-})
+function openCreateModal() {
+  showCreateModal.value = true
+}
+
+async function onProjectCreated() {
+  await loadProjects()
+}
 
 onMounted(loadProjects)
 </script>

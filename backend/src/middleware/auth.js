@@ -1,11 +1,11 @@
 import { verifyIdToken } from '../config/firebase.js'
-import { getDocument, setDocument } from '../services/firestore.service.js'
+import { getDocument, createDocumentWithId } from '../services/firestore.service.js'
 
 function buildProfile(user) {
-  const now = new Date()
+  const now = new Date().toISOString()
   return {
-    email: user.email,
-    fullName: user.name || user.email.split('@')[0] || '',
+    email: user.email || '',
+    fullName: user.name || (user.email ? user.email.split('@')[0] : ''),
     role: 'cashier',
     isActive: true,
     createdAt: now,
@@ -27,11 +27,22 @@ export async function authMiddleware(req, res, next) {
     let profile = await getDocument(token, 'users', user.uid)
 
     if (!profile) {
-      const created = buildProfile(user)
-      profile = await setDocument(token, 'users', user.uid, created)
+      try {
+        profile = await createDocumentWithId(token, 'users', user.uid, buildProfile(user))
+      } catch (createError) {
+        // Race: another request may have created it
+        profile = await getDocument(token, 'users', user.uid)
+        if (!profile) {
+          console.error('Firestore profile create failed:', createError.message, createError.details)
+          return res.status(403).json({
+            error: 'No se pudo crear el perfil en Firestore',
+            detail: createError.message,
+          })
+        }
+      }
     }
 
-    if (!profile.isActive) {
+    if (profile.isActive === false) {
       return res.status(403).json({ error: 'Tu cuenta está desactivada' })
     }
 
@@ -40,9 +51,13 @@ export async function authMiddleware(req, res, next) {
     req.accessToken = token
     next()
   } catch (error) {
-    if (error.status === 403) {
-      return res.status(403).json({ error: 'Tu cuenta está desactivada' })
+    console.error('Auth middleware error:', error.message, error.details || '')
+    if (error.code === 'ERR_JWT_CLAIM_VALIDATION_FAILED' || error.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') {
+      return res.status(401).json({ error: 'Token inválido o expirado' })
     }
-    return res.status(401).json({ error: 'Token inválido o expirado' })
+    return res.status(401).json({
+      error: 'Token inválido o expirado',
+      detail: error.message,
+    })
   }
 }

@@ -5,3 +5,5 @@ dist/
 *.log
 *-firebase-adminsdk-*.json
 serviceAccount*.json
+*.zip
+backend/public/

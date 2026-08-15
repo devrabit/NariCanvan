@@ -25,3 +25,25 @@ export async function fetchProjects(accessToken, search = '') {
 
   return response.json()
 }
+
+export async function createProject(accessToken, payload) {
+  const token = await getAccessToken(accessToken)
+  const response = await fetch(`${API_URL}/api/projects`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    const err = new Error(data.error || 'Error al crear el proyecto')
+    err.fields = data.fields || null
+    throw err
+  }
+
+  return data
+}

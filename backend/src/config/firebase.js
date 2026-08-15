@@ -1,6 +1,6 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 
-const projectId = process.env.FIREBASE_PROJECT_ID
+const projectId = process.env.FIREBASE_PROJECT_ID || 'naricanvan'
 
 if (!projectId) {
   throw new Error('Missing FIREBASE_PROJECT_ID environment variable')
