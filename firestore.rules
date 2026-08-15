@@ -1,0 +1,138 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: Firebase Auth UID
+    // Fields:
+    //   - email: string (required, valid email, max 320) - PII, owner-only read
+    //   - fullName: string (optional, max 120)
+    //   - role: string (required, 'admin' | 'cashier') - immutable via client
+    //   - isActive: bool (required) - immutable via client
+    //   - createdAt: timestamp (required, immutable)
+    //   - updatedAt: timestamp (required)
+    //
+    // Collection: projects
+    // Document ID: auto-id
+    // Fields:
+    //   - title: string (required, 1-120)
+    //   - description: string (required, max 2000)
+    //   - status: string (required, in_progress | review | planning | archived)
+    //   - progress: int (required, 0-100)
+    //   - memberCount: int (required, 0-500)
+    //   - lastActivityAt: timestamp (required)
+    //   - ownerId: string (required, auth uid, immutable)
+    //   - createdAt: timestamp (required, immutable)
+    //   - updatedAt: timestamp (required)
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function isAdmin() {
+      return isAuthenticated()
+        && exists(userPath(request.auth.uid))
+        && get(userPath(request.auth.uid)).data.role == 'admin'
+        && get(userPath(request.auth.uid)).data.isActive == true;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string
+        && request.resource.data[field].size() >= minLen
+        && request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidEmail(email) {
+      return email is string
+        && email.size() <= 320
+        && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['email', 'fullName', 'role', 'isActive', 'createdAt', 'updatedAt'])
+        && isValidEmail(data.email)
+        && data.fullName is string
+        && data.fullName.size() <= 120
+        && data.role in ['admin', 'cashier']
+        && data.isActive is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidProject(data) {
+      return hasOnlyAllowedFields([
+          'title', 'description', 'status', 'progress', 'memberCount',
+          'lastActivityAt', 'ownerId', 'createdAt', 'updatedAt'
+        ])
+        && validStringLength('title', 1, 120)
+        && validStringLength('description', 0, 2000)
+        && data.status in ['in_progress', 'review', 'planning', 'archived']
+        && data.progress is int
+        && data.progress >= 0
+        && data.progress <= 100
+        && data.memberCount is int
+        && data.memberCount >= 0
+        && data.memberCount <= 500
+        && data.lastActivityAt is timestamp
+        && data.ownerId is string
+        && data.ownerId.size() > 0
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+
+      allow create: if isOwner(userId)
+        && isValidUser(request.resource.data)
+        && request.resource.data.role == 'cashier'
+        && request.resource.data.isActive == true
+        && request.resource.data.email == request.auth.token.email;
+
+      allow update: if isOwner(userId)
+        && isValidUser(request.resource.data)
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.isActive == resource.data.isActive
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if false;
+    }
+
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid || isAdmin()
+      );
+
+      allow create: if isAuthenticated()
+        && isValidProject(request.resource.data)
+        && request.resource.data.ownerId == request.auth.uid;
+
+      allow update: if isAuthenticated()
+        && resource.data.ownerId == request.auth.uid
+        && isValidProject(request.resource.data)
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if isAuthenticated()
+        && resource.data.ownerId == request.auth.uid;
+    }
+  }
+}

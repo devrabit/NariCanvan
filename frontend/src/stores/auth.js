@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { supabase } from '../services/supabase'
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth'
+import { auth } from '../services/firebase'
 import { fetchProfile } from '../services/authService'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -13,28 +18,31 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!session.value)
 
+  async function setSessionFromUser(firebaseUser) {
+    if (!firebaseUser) {
+      session.value = null
+      user.value = null
+      profile.value = null
+      return
+    }
+
+    const accessToken = await firebaseUser.getIdToken()
+    session.value = { access_token: accessToken }
+    user.value = firebaseUser
+  }
+
   async function login(email, password) {
     loading.value = true
     error.value = null
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const credential = await signInWithEmailAndPassword(auth, email, password)
+      await setSessionFromUser(credential.user)
 
-      if (authError) {
-        error.value = 'Email o contraseña incorrectos'
-        return false
-      }
-
-      session.value = data.session
-      user.value = data.user
-
-      const userProfile = await fetchProfile(data.session.access_token)
+      const userProfile = await fetchProfile(session.value.access_token)
 
       if (!userProfile.isActive) {
-        await supabase.auth.signOut()
+        await signOut(auth)
         session.value = null
         user.value = null
         profile.value = null
@@ -45,7 +53,12 @@ export const useAuthStore = defineStore('auth', () => {
       profile.value = userProfile
       return true
     } catch (err) {
-      error.value = err.message || 'Error al iniciar sesión'
+      const code = err?.code || ''
+      if (code.startsWith('auth/')) {
+        error.value = 'Email o contraseña incorrectos'
+      } else {
+        error.value = err.message || 'Error al iniciar sesión'
+      }
       return false
     } finally {
       loading.value = false
@@ -54,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     loading.value = true
-    await supabase.auth.signOut()
+    await signOut(auth)
     session.value = null
     user.value = null
     profile.value = null
@@ -75,19 +88,15 @@ export const useAuthStore = defineStore('auth', () => {
   async function initAuth() {
     if (initialized.value) return
 
-    const { data: { session: currentSession } } = await supabase.auth.getSession()
-
-    if (currentSession) {
-      session.value = currentSession
-      user.value = currentSession.user
+    await auth.authStateReady()
+    await setSessionFromUser(auth.currentUser)
+    if (auth.currentUser) {
       await fetchUserProfile()
     }
 
-    supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      session.value = newSession
-      user.value = newSession?.user ?? null
-
-      if (newSession) {
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      await setSessionFromUser(firebaseUser)
+      if (firebaseUser) {
         await fetchUserProfile()
       } else {
         profile.value = null

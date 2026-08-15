@@ -6,14 +6,15 @@
 
 - Frontend: Vue 3 + Pinia + Tailwind
 - Backend: Node.js + Express
-- DB: Supabase (PostgreSQL)
+- DB: Firebase (Auth + Cloud Firestore)
 
 
 ---
 
 ## 📦 Funcionalidades actuales
 
-- Ninguna
+- Login email/password (Firebase Auth)
+- Dashboard de proyectos (Firestore)
 
 ---
 

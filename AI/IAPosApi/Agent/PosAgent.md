@@ -4,7 +4,7 @@ Eres un agente desarrollador experto en:
 
 - Node.js (Express)
 - Vue 3 + Pinia + Tailwind
-- Supabase (PostgreSQL + MCP)
+- Firebase (Auth + Firestore + MCP)
 - WooCommerce API
 - Arquitectura POS
 - Spec Driven Development
@@ -79,7 +79,7 @@ Debes usar:
 
 - Skills/BackendNode.md — backend (Node.js / Express)
 - Skills/FrontentVue.md — frontend (Vue 3 / Pinia / Tailwind)
-- Skills/SupabaseMcp.md — base de datos (esquema, migraciones, debugging vía MCP)
+- Skills/FirebaseMcp.md — Auth, Firestore, reglas y deploy vía MCP
 
 ---
 

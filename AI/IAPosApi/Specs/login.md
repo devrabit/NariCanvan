@@ -1,5 +1,8 @@
 # SPEC: Módulo de Login
 
+> **Actualizado:** Auth y datos viven en Firebase. Ver `Specs/firebase-migration.md`.
+> Este documento conserva las reglas de negocio del login; sustituir “Supabase” por Firebase Auth + colección `users`.
+
 ---
 
 ## 🎯 Objetivo
