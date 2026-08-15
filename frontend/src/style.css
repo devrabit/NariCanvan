@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  overflow-x: hidden;
+}
+
+.bouncy-hover:hover {
+  transform: scale(1.03);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bouncy-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+.tinted-shadow-primary {
+  box-shadow: 0 10px 30px -5px rgba(224, 64, 160, 0.25);
+}
+
+.floating-shape {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.bouncy {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bouncy:hover {
+  transform: scale(1.03);
+}
+
+.bouncy:active {
+  transform: scale(0.95);
+}
+
+.pink-shadow {
+  box-shadow: 0 4px 16px rgba(224, 64, 160, 0.2);
+}
+
+.purple-shadow {
+  box-shadow: 0 4px 16px rgba(124, 82, 170, 0.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #dcc8e0;
+  border-radius: 10px;
+}
