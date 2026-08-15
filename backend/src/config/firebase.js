@@ -1,9 +1,9 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 
-const projectId = process.env.FIREBASE_PROJECT_ID || 'naricanvan'
+const projectId = process.env.FB_PROJECT_ID || 'naricanvan'
 
 if (!projectId) {
-  throw new Error('Missing FIREBASE_PROJECT_ID environment variable')
+  throw new Error('Missing FB_PROJECT_ID environment variable')
 }
 
 const JWKS = createRemoteJWKSet(
