@@ -1,0 +1,316 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Candy Board - Tablero de Proyecto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#dcc8e0",
+                        "on-secondary-fixed": "#1a1030",
+                        "on-primary-fixed": "#3d0028",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#f0a0cc",
+                        "on-tertiary-fixed-variant": "#005580",
+                        "inverse-on-surface": "#fef7ff",
+                        "primary": "#e040a0",
+                        "surface-bright": "#fef7ff",
+                        "secondary-fixed-dim": "#c8a8e8",
+                        "secondary-container": "#eedcff",
+                        "on-surface-variant": "#604868",
+                        "surface-container-highest": "#ece2ec",
+                        "tertiary": "#0096cc",
+                        "surface-container": "#f8eef8",
+                        "surface-tint": "#e040a0",
+                        "surface-dim": "#e0d6e0",
+                        "on-tertiary-fixed": "#001a33",
+                        "on-primary-fixed-variant": "#a02070",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#2e2040",
+                        "secondary-fixed": "#eedcff",
+                        "secondary": "#7c52aa",
+                        "tertiary-fixed-dim": "#80d0f0",
+                        "surface-variant": "#f2e8f2",
+                        "outline": "#907898",
+                        "on-surface": "#2e1a28",
+                        "primary-container": "#f080c0",
+                        "on-secondary-fixed-variant": "#4a3068",
+                        "tertiary-container": "#40c0ee",
+                        "on-error-container": "#9b1c1c",
+                        "primary-fixed": "#ffd6ee",
+                        "surface": "#fef7ff",
+                        "on-background": "#2e1a28",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#f2e8f2",
+                        "tertiary-fixed": "#c8eaff",
+                        "error-container": "#ffe8e8",
+                        "error": "#e53e3e",
+                        "background": "#fef7ff",
+                        "on-tertiary-container": "#00334d",
+                        "surface-container-low": "#fbf2fb",
+                        "on-primary-container": "#2e1a28",
+                        "inverse-primary": "#f0a0cc",
+                        "inverse-surface": "#2e1a28"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["DM Sans"],
+                        "display": ["DM Sans"],
+                        "body": ["DM Sans"],
+                        "label": ["DM Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .kanban-column { min-height: calc(100vh - 180px); }
+        .bouncy { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .bouncy:active { transform: scale(0.95); }
+        .card-drag { cursor: grab; }
+        .card-drag:active { cursor: grabbing; transform: rotate(2deg) scale(1.05); z-index: 50; }
+        .custom-shadow-pink { box-shadow: 0 4px 16px rgba(224, 64, 160, 0.15); }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col p-4 bg-surface dark:bg-surface-dim border-r border-outline-variant dark:border-outline z-50">
+<div class="mb-8 px-4">
+<h1 class="text-headline-sm font-bold text-primary tracking-tight">NariBoard</h1>
+<p class="text-label-md font-medium text-on-surface-variant">Espacio Candy</p>
+</div>
+<nav class="flex-grow space-y-2">
+<!-- Active: Proyectos -->
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-full px-4 py-3 transition-all duration-300 scale-[1.03] bouncy shadow-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body text-label-md font-medium">Proyectos</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 transition-all hover:scale-[1.03] hover:shadow-[0_4px_16px_rgba(224,64,160,0.15)] duration-300" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-body text-label-md font-medium">Perfil</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 transition-all hover:scale-[1.03] hover:shadow-[0_4px_16px_rgba(224,64,160,0.15)] duration-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body text-label-md font-medium">Cerrar sesión</span>
+</a>
+</nav>
+<div class="mt-auto px-2">
+<button class="w-full py-4 bg-primary text-on-primary rounded-full font-bold flex items-center justify-center gap-2 bouncy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+                Nuevo Proyecto
+            </button>
+<div class="mt-6 flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+<img alt="Usuario actual" class="w-10 h-10 rounded-full border-2 border-primary" data-alt="Close-up portrait of a friendly young male professional with a warm smile, set against a clean, softly lit studio background with pastel pink and purple ambient lighting. High-quality digital photography style consistent with a modern, joyful UI brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiKlp5ourUpXNUqQ_U0j6_i_C5tYhbutY7x6bMo41aH-xsatitSS6QL4l8WyJ51l7sQe3HSwh6eDFK-KqWOA_GAX5jjxKu4tLpW-ldKQ1cVKeshGkl7MOsrKhmugkxonP7ZFhKxyp-pGhZtVLMowRMmy8I9M0nZIshtJOkeuDmJR6LEMvJ_3poIUBOh3OdB47OZGPUTZutnDiJ0nqMv0x3enAoD_x2HU1-6WOWZNACqwPG-YKWPUYa1jeMPE9Mb6zqV0NIXMygLMqW">
+<div class="overflow-hidden">
+<p class="text-label-md font-bold truncate">Alex Rivera</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Product Manager</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex flex-col h-screen">
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full px-6 py-3 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md sticky top-0 z-40">
+<div class="flex items-center gap-6">
+<span class="text-xl font-black text-primary">NariBoard</span>
+<div class="relative w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Buscar tareas..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:text-tertiary transition-colors Active: scale-95 duration-200">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:text-tertiary transition-colors Active: scale-95 duration-200">settings</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-body-sm font-bold leading-tight">Proyecto: Rediseño App</p>
+<p class="text-[10px] text-secondary font-medium">Sprint 12 • 45% completado</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold border-2 border-surface">
+                        RB
+                    </div>
+</div>
+</div>
+</header>
+<!-- Kanban Board Canvas -->
+<section class="flex-grow p-6 overflow-x-auto overflow-y-hidden">
+<div class="flex gap-6 h-full min-w-max pb-4">
+<!-- Column: Pendiente -->
+<div class="w-80 flex flex-col bg-surface-container-low/50 rounded-xl p-4 kanban-column">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<h3 class="font-bold text-on-surface">Pendiente</h3>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded-full text-xs font-bold">3</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">add_circle</button>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-1">
+<!-- Task Card 1 -->
+<div class="bg-surface rounded-lg p-4 shadow-sm border border-outline-variant/30 card-drag bouncy hover:shadow-md hover:border-primary/20 transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Alta</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">more_horiz</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1">Diseñar Hero Section</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">Crear propuesta visual para la sección principal con el nuevo estilo Candy.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs">schedule</span>
+<span class="text-[10px] font-bold">Oct 24</span>
+</div>
+<img alt="Avatar" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a creative female professional with vibrant energy, styled with a colorful, modern aesthetic. The lighting is soft and cheerful with subtle hints of pink and blue, reflecting a joyful and playful workplace atmosphere consistent with the Candy brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTFFx2RYMsb3a_ndBpDg2LYIiO7m03vwXyHCbA88QbDCTqkS7PjcvH3wwiA4m7I_Qpimb8nt0pFUv5rW7fumDfL-HLGC36QGy13avBpEd8U9XyolovtHpzoljTjArKSlnW8OzsMoSfkdu_aVhD6RGjvALri5LOVR2kHhKm8czzd5_7eZFRpaOkkzMqdlOwhMCq4GaD6mnUC0DsYvHieb9h_VCjOVaUgBQhKwgrJ7zcGqWuRufGcjhVwrkOoyRDVpHXacAKLu0H6zWV">
+</div>
+</div>
+<!-- Task Card 2 -->
+<div class="bg-surface rounded-lg p-4 shadow-sm border border-outline-variant/30 card-drag bouncy hover:shadow-md hover:border-primary/20 transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Media</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">more_horiz</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1">Revisión de Iconografía</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">Verificar que todos los iconos de Material Symbols usen el peso adecuado.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs">schedule</span>
+<span class="text-[10px] font-bold">Oct 26</span>
+</div>
+<div class="w-7 h-7 rounded-full bg-tertiary-container flex items-center justify-center text-[10px] font-bold text-on-tertiary-container border-2 border-white">JS</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: En progreso -->
+<div class="w-80 flex flex-col bg-surface-container-low/50 rounded-xl p-4 kanban-column">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary"></span>
+<h3 class="font-bold text-on-surface">En progreso</h3>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded-full text-xs font-bold">2</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">add_circle</button>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-1">
+<!-- Task Card 3 (Active/Dragging Simulation State) -->
+<div class="bg-surface rounded-lg p-4 custom-shadow-pink border-2 border-primary/40 rotate-1 scale-[1.02] cursor-grabbing relative z-10">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Alta</span>
+<span class="material-symbols-outlined text-sm text-primary">drag_indicator</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1">Integración Tailwind</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">Configurar el archivo tailwind.config.js con los nuevos tokens de color.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="text-[10px] font-black tracking-tighter">AHORA</span>
+</div>
+<img alt="Avatar" class="w-7 h-7 rounded-full border-2 border-primary" data-alt="Headshot of a focused male developer in a modern, creative office space. Soft, high-key lighting highlights his features against a background that features subtle, vibrant accent colors like sky blue and electric purple. Minimalist and joyful aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq-4l4N_HqRb67eDDXoj7iGQeYqRz1LvxmdrOwqUYkWl5FhufcGQOiERnEv1dKH0NPoRyBO229av2YAaszf4qQxwf739bPH1YhbJduxXF3T_m9Wseu8xb82A2WYF5rVR5BdIE22lGdRSjxsxmpsy8veiC8wq_cPye1gUo2CwnqU1g2cRr2iL2OqzNWBODu1U3YSCGTs6k1AkeTcbWKxOfk6_mrdDLnFKHq9RXhxIHXOqgOY9l8_lDdrDUM4Ix1VwfDjPtYKXFWqc5T">
+</div>
+</div>
+<!-- Task Card 4 -->
+<div class="bg-surface rounded-lg p-4 shadow-sm border border-outline-variant/30 card-drag bouncy hover:shadow-md transition-all opacity-80">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Baja</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">more_horiz</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1">Testing de Microinteracciones</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">Probar el comportamiento de los botones bouncy en dispositivos móviles.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1 text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs">schedule</span>
+<span class="text-[10px] font-bold">Oct 30</span>
+</div>
+<div class="flex -space-x-2">
+<img alt="Avatar" class="w-7 h-7 rounded-full border-2 border-white" data-alt="Professional portrait of a cheerful woman with an expressive smile, set in a brightly lit studio environment with soft-focus colorful background elements. High contrast and clean composition, following the vibrant and joyful Candy UI design principles." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcvd-OUOlXQhjYUpOIgIMl-bDAbkKcmZzNbO31Kfgcvh3P8sDHd8_v-fdE0cL6okeJ5tVpuKyA8DpyNT9TvmI-Jp05dX41HwVA4mJjwtNpuFMgy3IZ4RY6owLjddhl5dTgw4c4yD2OzXJINcVxDn8zFBFLZ2N9DRKA2KZsvMlrH2mS_o8qJToIVJ75ok7jZtqLn0eAEV70PEF1yaCjSxZF4hW0O5XgGPM4B5WAW-9feaiIqnaZCUsjmc_EMn0eF_WpoeQasprPyDyX">
+<div class="w-7 h-7 rounded-full bg-secondary text-[8px] flex items-center justify-center text-white font-bold border-2 border-white">+1</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Terminado -->
+<div class="w-80 flex flex-col bg-surface-container-low/50 rounded-xl p-4 kanban-column">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-green-500"></span>
+<h3 class="font-bold text-on-surface">Terminado</h3>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded-full text-xs font-bold">5</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">check_circle</button>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-1">
+<!-- Task Card 5 (Completed) -->
+<div class="bg-surface/60 rounded-lg p-4 border border-outline-variant/20 grayscale-[0.5] opacity-70">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-outline-variant text-on-surface-variant text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Finalizado</span>
+<span class="material-symbols-outlined text-sm text-green-500" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1 line-through decoration-primary/40">Definición de Paleta</h4>
+<p class="text-sm text-on-surface-variant line-clamp-1 mb-4">Aprobación final del color Primary (#e040a0).</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1 text-green-600 bg-green-100 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs">task_alt</span>
+<span class="text-[10px] font-bold">Completado</span>
+</div>
+<img alt="Avatar" class="w-7 h-7 rounded-full border-2 border-white" data-alt="Close-up portrait of a friendly young male professional with a warm smile, set against a clean, softly lit studio background with pastel pink and purple ambient lighting. High-quality digital photography style consistent with a modern, joyful UI brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB5zyaZHcWk4WkRzuUbyBkfsJJFXoYlc06XjBKIk4Pn2GoGQ961YFG1WamNl-7WcW7j5A7GRm_vASkjEPADn3YQ3U6h8cRi5wYkJGM6cMZ0Wg0PSr7Bwvg0HDBGrdofO5Ak5qCxBDgE5S4dfgpPfDSE4oZ3mR94gLK0-kiJgbtZQs5oXQR39Nq6ov_nim7H8k8KEW3dTHOfhz65E9nDUs5MCZU9_-3HH4Mlly7p-0wLwR3us5K4-CXFlpUwLjmZkj71E8-JQPSwYur">
+</div>
+</div>
+</div>
+</div>
+<!-- Empty Column Hint -->
+<div class="w-80 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center gap-3 p-8 opacity-40 hover:opacity-100 transition-opacity cursor-pointer group">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-primary transition-colors">add_circle</span>
+<p class="text-on-surface-variant font-bold text-center">Añadir nueva columna</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button - Contextual for Dashboard -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-xl shadow-primary/30 flex items-center justify-center bouncy z-50 group">
+<span class="material-symbols-outlined text-3xl transition-transform group-hover:rotate-90">add</span>
+</button>
+<script>
+        // Simulation of simple interactions
+        document.querySelectorAll('.bouncy').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('scale-95');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('scale-95');
+            });
+        });
+
+        // Basic Drag & Drop Visual Hint
+        const cards = document.querySelectorAll('.card-drag');
+        cards.forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                card.style.opacity = '0.4';
+            });
+            card.addEventListener('dragend', () => {
+                card.style.opacity = '1';
+            });
+        });
+    </script>
+
+
+</body></html>
