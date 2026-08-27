@@ -10,6 +10,8 @@
         @drop="$emit('drop', $event)"
         @dragstart="$emit('dragstart', $event)"
         @dragend="$emit('dragend')"
+        @edit="$emit('edit', $event)"
+        @delete="$emit('delete', $event)"
       />
     </div>
   </section>
@@ -23,7 +25,7 @@ const props = defineProps({
   tasks: { type: Array, default: () => [] },
 })
 
-defineEmits(['create', 'drop', 'dragstart', 'dragend'])
+defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete'])
 
 const columns = [
   { status: 'pending', label: 'Pendiente' },

@@ -171,6 +171,16 @@ export async function patchDocumentByPath(accessToken, documentPath, data) {
   return parseDocument(doc)
 }
 
+export async function deleteDocumentByPath(accessToken, documentPath) {
+  const result = await firestoreRequest(accessToken, `/${documentPath}`, { method: 'DELETE' })
+  if (result === null) {
+    const error = new Error('Not found')
+    error.status = 404
+    throw error
+  }
+  return true
+}
+
 export async function queryCollection(accessToken, collectionId, structuredQuery) {
   const response = await fetch(`${BASE()}:runQuery`, {
     method: 'POST',

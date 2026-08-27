@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.js'
 import { createProject, getProject, listProjects } from '../controllers/projects.controller.js'
-import { createTask, listTasks, patchTask } from '../controllers/tasks.controller.js'
+import { createTask, deleteTask, listTasks, patchTask } from '../controllers/tasks.controller.js'
 
 const router = Router()
 
@@ -11,5 +11,6 @@ router.get('/:projectId', authMiddleware, getProject)
 router.get('/:projectId/tasks', authMiddleware, listTasks)
 router.post('/:projectId/tasks', authMiddleware, createTask)
 router.patch('/:projectId/tasks/:taskId', authMiddleware, patchTask)
+router.delete('/:projectId/tasks/:taskId', authMiddleware, deleteTask)
 
 export default router

@@ -1,20 +1,49 @@
 <template>
   <article
     draggable="true"
-    class="bg-surface rounded-lg p-4 shadow-sm border border-outline-variant/30 card-drag bouncy hover:shadow-md hover:border-primary/20 transition-all cursor-grab"
+    class="bg-surface rounded-lg p-4 shadow-sm border border-outline-variant/30 card-drag bouncy hover:shadow-md hover:border-primary/20 transition-all cursor-grab relative"
     :class="task.status === 'done' ? 'bg-surface/60 grayscale-[0.5] opacity-70' : ''"
-    @dragstart="$emit('dragstart', task)"
+    @dragstart="onDragStart"
     @dragend="$emit('dragend')"
   >
     <div class="flex justify-between items-start mb-2">
       <span :class="priorityClass">{{ task.status === 'done' ? 'Finalizado' : task.priorityLabel }}</span>
-      <span
-        class="material-symbols-outlined text-sm"
-        :class="task.status === 'done' ? 'text-green-500' : 'text-on-surface-variant'"
-        :style="task.status === 'done' ? { fontVariationSettings: `'FILL' 1` } : {}"
-      >
-        {{ task.status === 'done' ? 'check_circle' : 'more_horiz' }}
-      </span>
+      <div class="relative">
+        <button
+          type="button"
+          class="material-symbols-outlined text-sm text-on-surface-variant hover:text-primary transition-colors"
+          aria-label="Opciones de tarea"
+          aria-haspopup="menu"
+          :aria-expanded="menuOpen"
+          @click.stop="toggleMenu"
+          @mousedown.stop
+        >
+          more_horiz
+        </button>
+        <div
+          v-if="menuOpen"
+          class="absolute right-0 top-7 z-20 min-w-[140px] rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg py-1 overflow-hidden"
+          role="menu"
+          @click.stop
+        >
+          <button
+            type="button"
+            class="w-full text-left px-4 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+            role="menuitem"
+            @click="onEdit"
+          >
+            Editar
+          </button>
+          <button
+            type="button"
+            class="w-full text-left px-4 py-2 text-sm font-medium text-error hover:bg-error-container transition-colors"
+            role="menuitem"
+            @click="onDelete"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
     </div>
     <h4 class="font-bold text-on-surface mb-1" :class="task.status === 'done' ? 'line-through decoration-primary/40' : ''">
       {{ task.title }}
@@ -55,14 +84,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { formatShortDate } from '../utils/formatDate'
 
 const props = defineProps({
   task: { type: Object, required: true },
 })
 
-defineEmits(['dragstart', 'dragend'])
+const emit = defineEmits(['dragstart', 'dragend', 'edit', 'delete'])
+
+const menuOpen = ref(false)
 
 const PRIORITY_CLASS = {
   high: 'bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter',
@@ -80,5 +111,49 @@ const priorityClass = computed(() => {
 const assigneeInitial = computed(() => {
   const id = props.task.assigneeIds?.[0] || props.task.createdBy || '?'
   return String(id).slice(0, 2).toUpperCase()
+})
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
+
+function closeMenu() {
+  menuOpen.value = false
+}
+
+function onEdit() {
+  closeMenu()
+  emit('edit', props.task)
+}
+
+function onDelete() {
+  closeMenu()
+  emit('delete', props.task)
+}
+
+function onDragStart(event) {
+  if (menuOpen.value) {
+    event.preventDefault()
+    return
+  }
+  emit('dragstart', props.task)
+}
+
+function onDocumentClick() {
+  if (menuOpen.value) closeMenu()
+}
+
+function onKeydown(event) {
+  if (event.key === 'Escape' && menuOpen.value) closeMenu()
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  window.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onDocumentClick)
+  window.removeEventListener('keydown', onKeydown)
 })
 </script>

@@ -31,6 +31,8 @@
         :task="task"
         @dragstart="$emit('dragstart', $event)"
         @dragend="$emit('dragend')"
+        @edit="$emit('edit', $event)"
+        @delete="$emit('delete', $event)"
       />
     </div>
   </div>
@@ -45,7 +47,7 @@ const props = defineProps({
   tasks: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['create', 'drop', 'dragstart', 'dragend'])
+const emit = defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete'])
 
 const isOver = ref(false)
 

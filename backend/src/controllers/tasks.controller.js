@@ -1,5 +1,6 @@
 import {
   createDocumentAtPath,
+  deleteDocumentByPath,
   getDocument,
   listDocumentsAtPath,
   patchDocumentByPath,
@@ -138,6 +139,32 @@ export async function patchTask(req, res) {
     const status = error.status === 403 ? 403 : 500
     res.status(status).json({
       error: status === 403 ? 'Sin permiso para actualizar la tarea' : 'Error al actualizar la tarea',
+      detail: error.message,
+    })
+  }
+}
+
+export async function deleteTask(req, res) {
+  try {
+    const project = await loadAccessibleProject(req, res)
+    if (!project) return
+
+    const path = `projects/${project.id}/tasks/${req.params.taskId}`
+    try {
+      await deleteDocumentByPath(req.accessToken, path)
+    } catch (error) {
+      if (error.status === 404) {
+        return res.status(404).json({ error: 'Tarea no encontrada' })
+      }
+      throw error
+    }
+
+    res.status(204).send()
+  } catch (error) {
+    console.error(error)
+    const status = error.status === 403 ? 403 : 500
+    res.status(status).json({
+      error: status === 403 ? 'Sin permiso para eliminar la tarea' : 'Error al eliminar la tarea',
       detail: error.message,
     })
   }

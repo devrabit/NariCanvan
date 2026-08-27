@@ -9,7 +9,7 @@
       Cargando tablero...
     </div>
 
-    <div v-else-if="error" class="text-center py-16">
+    <div v-else-if="error && !project" class="text-center py-16">
       <p class="text-error bg-error-container rounded-lg px-6 py-4 inline-block">{{ error }}</p>
       <div class="mt-6">
         <router-link :to="{ name: 'dashboard' }" class="text-primary font-bold hover:underline">
@@ -19,12 +19,20 @@
     </div>
 
     <div v-else>
+      <p
+        v-if="error"
+        class="mb-4 text-sm font-bold text-error bg-error-container px-4 py-3 rounded-full text-center"
+      >
+        {{ error }}
+      </p>
       <KanbanBoard
         :tasks="filteredTasks"
         @create="openCreate"
         @drop="onDrop"
         @dragstart="draggingTask = $event"
         @dragend="draggingTask = null"
+        @edit="openEdit"
+        @delete="onDeleteTask"
       />
     </div>
 
@@ -38,11 +46,13 @@
     </button>
 
     <CreateTaskModal
-      :open="showCreate"
+      :open="showModal"
       :project-id="route.params.projectId"
       :default-status="createStatus"
-      @close="showCreate = false"
+      :task="editingTask"
+      @close="closeModal"
       @created="onTaskCreated"
+      @updated="onTaskUpdated"
     />
   </DashboardLayout>
 </template>
@@ -52,7 +62,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { fetchProject } from '../services/projectsService'
-import { fetchTasks, patchTask } from '../services/tasksService'
+import { deleteTask, fetchTasks, patchTask } from '../services/tasksService'
 import DashboardLayout from '../components/DashboardLayout.vue'
 import KanbanBoard from '../components/KanbanBoard.vue'
 import CreateTaskModal from '../components/CreateTaskModal.vue'
@@ -65,8 +75,9 @@ const tasks = ref([])
 const loading = ref(true)
 const error = ref(null)
 const search = ref('')
-const showCreate = ref(false)
+const showModal = ref(false)
 const createStatus = ref('pending')
+const editingTask = ref(null)
 const draggingTask = ref(null)
 
 const filteredTasks = computed(() => {
@@ -100,12 +111,41 @@ async function loadBoard() {
 }
 
 function openCreate(status) {
+  editingTask.value = null
   createStatus.value = status || 'pending'
-  showCreate.value = true
+  showModal.value = true
+}
+
+function openEdit(task) {
+  editingTask.value = task
+  createStatus.value = task.status || 'pending'
+  showModal.value = true
+}
+
+function closeModal() {
+  showModal.value = false
+  editingTask.value = null
 }
 
 function onTaskCreated(task) {
   tasks.value = [task, ...tasks.value]
+}
+
+function onTaskUpdated(task) {
+  const index = tasks.value.findIndex((item) => item.id === task.id)
+  if (index >= 0) tasks.value[index] = task
+  else tasks.value = [task, ...tasks.value]
+}
+
+async function onDeleteTask(task) {
+  if (!window.confirm('¿Eliminar esta tarea? Esta acción no se puede deshacer.')) return
+  error.value = null
+  try {
+    await deleteTask(authStore.session.access_token, route.params.projectId, task.id)
+    tasks.value = tasks.value.filter((item) => item.id !== task.id)
+  } catch (err) {
+    error.value = err.message
+  }
 }
 
 async function onDrop(status) {
@@ -134,6 +174,7 @@ watch(
   () => route.params.projectId,
   () => {
     search.value = ''
+    closeModal()
     loadBoard()
   },
   { immediate: true },

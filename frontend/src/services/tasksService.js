@@ -54,3 +54,24 @@ export function patchTask(accessToken, projectId, taskId, payload) {
     },
   )
 }
+
+export async function deleteTask(accessToken, projectId, taskId) {
+  const token = await getAccessToken(accessToken)
+  const response = await fetch(
+    `${API_URL}/api/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  )
+
+  if (response.status === 204) return { ok: true }
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const err = new Error(data.error || 'Error al eliminar la tarea')
+    err.status = response.status
+    throw err
+  }
+  return data
+}
