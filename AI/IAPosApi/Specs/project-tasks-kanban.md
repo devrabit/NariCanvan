@@ -99,15 +99,15 @@ Respuestas JSON: `{ project }`, `{ tasks, total }`, `{ task }`.
 
 ## ✅ Criterios de aceptación
 
-- [ ] Clic en proyecto del dashboard abre `/projects/:id` y muestra Kanban Stitch.
-- [ ] Header muestra título y % del proyecto real.
-- [ ] Tres columnas con conteos correctos.
-- [ ] Tareas se listan desde Firestore vía API.
-- [ ] Crear tarea aparece en la columna correcta.
-- [ ] Mover tarea actualiza `status` y la UI.
-- [ ] Buscar tareas filtra en el board.
-- [ ] Usuario sin acceso no ve el board.
-- [ ] Reglas Firestore desplegadas para `tasks`.
+- [x] Clic en proyecto del dashboard abre `/projects/:id` y muestra Kanban Stitch.
+- [x] Header muestra título y % del proyecto real.
+- [x] Tres columnas con conteos correctos.
+- [x] Tareas se listan desde Firestore vía API.
+- [x] Crear tarea aparece en la columna correcta.
+- [x] Mover tarea actualiza `status` y la UI.
+- [x] Buscar tareas filtra en el board.
+- [x] Usuario sin acceso no ve el board.
+- [x] Reglas Firestore desplegadas para `tasks`.
 
 ---
 

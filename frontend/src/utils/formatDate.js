@@ -18,3 +18,13 @@ export function formatRelativeDate(dateString) {
   const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
   return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`
 }
+
+export function formatShortDate(dateString) {
+  if (!dateString) return ''
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+    ? new Date(`${dateString}T00:00:00`)
+    : new Date(dateString)
+  if (Number.isNaN(date.getTime())) return dateString
+  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  return `${months[date.getMonth()]} ${date.getDate()}`
+}

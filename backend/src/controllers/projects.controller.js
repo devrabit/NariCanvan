@@ -1,4 +1,4 @@
-import { createDocument, queryCollection } from '../services/firestore.service.js'
+import { createDocument, getDocument, queryCollection } from '../services/firestore.service.js'
 import {
   buildCreateProjectDocument,
   demoProjects,
@@ -73,5 +73,25 @@ export async function createProject(req, res) {
       error: status === 403 ? 'Sin permiso para crear el proyecto' : 'Error al crear el proyecto',
       detail: error.message,
     })
+  }
+}
+
+export async function getProject(req, res) {
+  try {
+    const project = await getDocument(req.accessToken, 'projects', req.params.projectId)
+
+    if (!project) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' })
+    }
+
+    const isAdmin = req.profile.role === 'admin'
+    if (project.ownerId !== req.user.uid && !isAdmin) {
+      return res.status(403).json({ error: 'No tienes acceso a este proyecto' })
+    }
+
+    res.json({ project: formatProject(project) })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener el proyecto' })
   }
 }

@@ -16,6 +16,7 @@
 - Login email/password (Firebase Auth)
 - Dashboard de proyectos (Firestore)
 - Crear proyecto (modal Stitch + POST /api/projects)
+- Detalle de proyecto + panel Kanban de tareas (`/projects/:id`)
 
 ---
 

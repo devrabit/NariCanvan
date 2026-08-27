@@ -14,6 +14,12 @@ const routes = [
     component: () => import('../views/ProjectsDashboardView.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/projects/:projectId',
+    name: 'project-board',
+    component: () => import('../views/ProjectBoardView.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

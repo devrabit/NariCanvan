@@ -11,11 +11,11 @@
         <router-link
           :to="{ name: 'dashboard' }"
           class="flex items-center gap-3 rounded-full px-4 py-3 transition-all duration-300 bouncy"
-          :class="isDashboard
+          :class="isProjectsNav
             ? 'bg-primary-container text-on-primary-container scale-[1.03] shadow-sm'
             : 'text-on-surface-variant hover:text-primary'"
         >
-          <span class="material-symbols-outlined" :class="{ filled: isDashboard }">dashboard</span>
+          <span class="material-symbols-outlined" :class="{ filled: isProjectsNav }">dashboard</span>
           <span class="font-medium">Proyectos</span>
         </router-link>
 
@@ -59,14 +59,24 @@
           <input
             :value="search"
             type="text"
-            placeholder="Buscar proyectos..."
+            :placeholder="searchPlaceholder"
             class="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-full border-none focus:ring-2 focus:ring-primary/30 transition-all outline-none"
             @input="$emit('update:search', $event.target.value)"
           />
         </div>
       </div>
       <div class="flex items-center gap-4">
-        <div class="text-xl font-black text-primary mr-4 hidden sm:block">NariBoard</div>
+        <div v-if="contextTitle" class="text-right hidden sm:block mr-2">
+          <p class="text-sm font-bold leading-tight">Proyecto: {{ contextTitle }}</p>
+          <p v-if="contextSubtitle" class="text-[10px] text-secondary font-medium">{{ contextSubtitle }}</p>
+        </div>
+        <div v-else class="text-xl font-black text-primary mr-4 hidden sm:block">NariBoard</div>
+        <div
+          v-if="contextTitle"
+          class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold border-2 border-surface"
+        >
+          {{ userInitials }}
+        </div>
         <button type="button" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant bouncy">
           <span class="material-symbols-outlined">notifications</span>
         </button>
@@ -90,6 +100,9 @@ import { useAuthStore } from '../stores/auth'
 
 defineProps({
   search: { type: String, default: '' },
+  searchPlaceholder: { type: String, default: 'Buscar proyectos...' },
+  contextTitle: { type: String, default: '' },
+  contextSubtitle: { type: String, default: '' },
 })
 
 defineEmits(['update:search'])
@@ -98,7 +111,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
-const isDashboard = computed(() => route.name === 'dashboard')
+const isProjectsNav = computed(() => route.name === 'dashboard' || route.name === 'project-board')
 
 const userInitials = computed(() => {
   const name = authStore.profile?.fullName || authStore.profile?.email || '?'

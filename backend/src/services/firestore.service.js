@@ -132,6 +132,45 @@ export async function createDocument(accessToken, collection, data) {
   }
 }
 
+export async function getDocumentByPath(accessToken, documentPath) {
+  const doc = await firestoreRequest(accessToken, `/${documentPath}`)
+  return doc ? parseDocument(doc) : null
+}
+
+export async function createDocumentAtPath(accessToken, collectionPath, data) {
+  const fields = toFields(data)
+  try {
+    const doc = await firestoreRequest(accessToken, `/${collectionPath}`, {
+      method: 'POST',
+      body: JSON.stringify({ fields }),
+    })
+    return parseDocument(doc)
+  } catch (error) {
+    console.error('Firestore createDocumentAtPath failed:', collectionPath, JSON.stringify(fields, null, 2))
+    throw error
+  }
+}
+
+export async function listDocumentsAtPath(accessToken, collectionPath) {
+  const body = await firestoreRequest(accessToken, `/${collectionPath}?pageSize=100`)
+  if (!body) return []
+  return (body.documents || []).map(parseDocument)
+}
+
+export async function patchDocumentByPath(accessToken, documentPath, data) {
+  const fieldPaths = Object.keys(data)
+  const mask = fieldPaths.map((p) => `updateMask.fieldPaths=${encodeURIComponent(p)}`).join('&')
+  const doc = await firestoreRequest(
+    accessToken,
+    `/${documentPath}?${mask}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ fields: toFields(data) }),
+    },
+  )
+  return parseDocument(doc)
+}
+
 export async function queryCollection(accessToken, collectionId, structuredQuery) {
   const response = await fetch(`${BASE()}:runQuery`, {
     method: 'POST',

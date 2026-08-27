@@ -1,6 +1,7 @@
 <template>
-  <div
-    class="bg-white rounded-lg purple-shadow border border-outline-variant/30 bouncy flex flex-col justify-between relative overflow-hidden group"
+  <router-link
+    :to="{ name: 'project-board', params: { projectId: project.id } }"
+    class="bg-white rounded-lg purple-shadow border border-outline-variant/30 bouncy flex flex-col justify-between relative overflow-hidden group text-left cursor-pointer no-underline text-inherit"
     :class="featured ? 'lg:col-span-2 p-8 min-h-[320px]' : 'p-6'"
   >
     <div
@@ -11,7 +12,11 @@
     <div :class="featured ? 'relative z-10' : ''">
       <div class="flex justify-between items-start" :class="featured ? 'mb-6' : 'mb-4'">
         <span :class="badgeClass">{{ project.statusLabel }}</span>
-        <button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+        <button
+          type="button"
+          class="text-on-surface-variant hover:text-primary transition-colors"
+          @click.prevent
+        >
           <span class="material-symbols-outlined">{{ statusIcon }}</span>
         </button>
       </div>
@@ -62,7 +67,7 @@
         </span>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script setup>

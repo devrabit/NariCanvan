@@ -31,6 +31,18 @@ service cloud.firestore {
     //   - createdAt: timestamp (required, immutable)
     //   - updatedAt: timestamp (required)
     //
+    // Subcollection: projects/{projectId}/tasks/{taskId}
+    // Fields:
+    //   - title: string (required, 1-120)
+    //   - description: string (optional, max 500)
+    //   - priority: string (required, low | medium | high)
+    //   - status: string (required, pending | in_progress | done)
+    //   - dueDate: string | null (optional, YYYY-MM-DD)
+    //   - assigneeIds: list<string> (required, 1-20)
+    //   - createdBy: string (required, auth uid, immutable)
+    //   - createdAt: timestamp (required, immutable)
+    //   - updatedAt: timestamp (required)
+    //
     // ===============================================================
 
     function isAuthenticated() {
@@ -87,6 +99,40 @@ service cloud.firestore {
         && data.fullName.size() <= 120
         && data.role in ['admin', 'cashier']
         && data.isActive is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function projectPath(projectId) {
+      return /databases/$(database)/documents/projects/$(projectId);
+    }
+
+    function canAccessProject(projectId) {
+      return isAuthenticated() && (
+        (
+          exists(projectPath(projectId))
+          && get(projectPath(projectId)).data.ownerId == request.auth.uid
+        )
+        || isAdmin()
+      );
+    }
+
+    function isValidTask(data) {
+      return hasOnlyAllowedFields([
+          'title', 'description', 'priority', 'status', 'dueDate',
+          'assigneeIds', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && validStringLength('title', 1, 120)
+        && data.description is string
+        && data.description.size() <= 500
+        && data.priority in ['low', 'medium', 'high']
+        && data.status in ['pending', 'in_progress', 'done']
+        && isValidDueDate(data)
+        && data.assigneeIds is list
+        && data.assigneeIds.size() >= 1
+        && data.assigneeIds.size() <= 20
+        && data.createdBy is string
+        && data.createdBy.size() > 0
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
@@ -160,6 +206,21 @@ service cloud.firestore {
 
       allow delete: if isAuthenticated()
         && resource.data.ownerId == request.auth.uid;
+
+      match /tasks/{taskId} {
+        allow read: if canAccessProject(projectId);
+
+        allow create: if canAccessProject(projectId)
+          && isValidTask(request.resource.data)
+          && request.resource.data.createdBy == request.auth.uid;
+
+        allow update: if canAccessProject(projectId)
+          && isValidTask(request.resource.data)
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.createdAt == resource.data.createdAt;
+
+        allow delete: if canAccessProject(projectId);
+      }
     }
   }
 }
