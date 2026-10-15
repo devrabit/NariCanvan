@@ -23,14 +23,14 @@
       <div class="w-full max-w-md z-10">
         <!-- Brand -->
         <div class="text-center mb-8">
-          <h1 class="text-4xl font-black text-on-surface tracking-tight mb-2">
+          <h1 class="text-3xl sm:text-4xl font-black text-on-surface tracking-tight mb-2">
             <span class="text-on-surface">Nari</span><span class="text-primary">Board</span>
           </h1>
           <p class="text-on-surface-variant font-medium">Keep it sweet.</p>
         </div>
 
         <!-- Card -->
-        <div class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-10 tinted-shadow-primary relative overflow-hidden">
+        <div class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-6 sm:p-10 tinted-shadow-primary relative overflow-hidden">
           <div class="absolute top-0 right-0 w-24 h-24 bg-primary-fixed rounded-bl-full opacity-10" />
 
           <div class="relative z-10">

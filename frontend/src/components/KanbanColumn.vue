@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-80 flex flex-col bg-surface-container-low/50 rounded-xl p-4 min-h-[calc(100vh-12rem)]"
+    class="w-[min(20rem,85vw)] shrink-0 snap-start flex flex-col bg-surface-container-low/50 rounded-xl p-4 min-h-[60vh] md:min-h-[calc(100vh-12rem)]"
     :class="isOver ? 'ring-2 ring-primary/40' : ''"
     @dragover.prevent="isOver = true"
     @dragleave="isOver = false"
@@ -33,6 +33,7 @@
         @dragend="$emit('dragend')"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
+        @move="$emit('move', $event)"
       />
     </div>
   </div>
@@ -47,7 +48,7 @@ const props = defineProps({
   tasks: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete'])
+const emit = defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete', 'move'])
 
 const isOver = ref(false)
 

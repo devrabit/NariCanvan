@@ -1,6 +1,6 @@
 <template>
-  <section class="overflow-x-auto overflow-y-hidden -mx-2">
-    <div class="flex gap-6 min-w-max pb-4">
+  <section class="overflow-x-auto overflow-y-hidden -mx-4 px-4 md:-mx-2 md:px-0 snap-x snap-mandatory overscroll-x-contain pb-24">
+    <div class="flex gap-4 md:gap-6 min-w-max">
       <KanbanColumn
         v-for="column in columns"
         :key="column.status"
@@ -12,6 +12,7 @@
         @dragend="$emit('dragend')"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
+        @move="$emit('move', $event)"
       />
     </div>
   </section>
@@ -25,7 +26,7 @@ const props = defineProps({
   tasks: { type: Array, default: () => [] },
 })
 
-defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete'])
+defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete', 'move'])
 
 const columns = [
   { status: 'pending', label: 'Pendiente' },

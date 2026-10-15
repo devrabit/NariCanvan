@@ -27,6 +27,16 @@
           @click.stop
         >
           <button
+            v-for="target in moveTargets"
+            :key="target.status"
+            type="button"
+            class="md:hidden w-full text-left px-4 py-3 min-h-11 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+            role="menuitem"
+            @click="onMove(target.status)"
+          >
+            Mover a {{ target.label }}
+          </button>
+          <button
             type="button"
             class="w-full text-left px-4 py-3 min-h-11 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
             role="menuitem"
@@ -91,7 +101,13 @@ const props = defineProps({
   task: { type: Object, required: true },
 })
 
-const emit = defineEmits(['dragstart', 'dragend', 'edit', 'delete'])
+const emit = defineEmits(['dragstart', 'dragend', 'edit', 'delete', 'move'])
+
+const MOVE_TARGETS = [
+  { status: 'pending', label: 'Pendiente' },
+  { status: 'in_progress', label: 'En progreso' },
+  { status: 'done', label: 'Terminado' },
+]
 
 const menuOpen = ref(false)
 
@@ -107,6 +123,8 @@ const priorityClass = computed(() => {
   }
   return PRIORITY_CLASS[props.task.priority] || PRIORITY_CLASS.medium
 })
+
+const moveTargets = computed(() => MOVE_TARGETS.filter((item) => item.status !== props.task.status))
 
 const assigneeInitial = computed(() => {
   const id = props.task.assigneeIds?.[0] || props.task.createdBy || '?'
@@ -129,6 +147,11 @@ function onEdit() {
 function onDelete() {
   closeMenu()
   emit('delete', props.task)
+}
+
+function onMove(status) {
+  closeMenu()
+  emit('move', { task: props.task, status })
 }
 
 function onDragStart(event) {

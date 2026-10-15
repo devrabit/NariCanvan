@@ -33,12 +33,13 @@
         @dragend="draggingTask = null"
         @edit="openEdit"
         @delete="onDeleteTask"
+        @move="onMove"
       />
     </div>
 
     <button
       type="button"
-      class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-xl shadow-primary/30 flex items-center justify-center bouncy z-50"
+      class="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-4 md:right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-xl shadow-primary/30 flex items-center justify-center bouncy z-50"
       aria-label="Nueva tarea"
       @click="openCreate('pending')"
     >
@@ -146,6 +147,11 @@ async function onDeleteTask(task) {
   } catch (err) {
     error.value = err.message
   }
+}
+
+function onMove({ task, status }) {
+  draggingTask.value = task
+  return onDrop(status)
 }
 
 async function onDrop(status) {

@@ -18,6 +18,7 @@
 - Crear proyecto (modal Stitch + POST /api/projects)
 - Detalle de proyecto + panel Kanban de tareas (`/projects/:id`)
 - Editar / eliminar tarea desde el menú ⋮ de la tarjeta
+- Layout móvil bajo 768 px: cajón de navegación, Kanban con scroll horizontal y “Mover a” en el menú de la tarea
 
 ---
 

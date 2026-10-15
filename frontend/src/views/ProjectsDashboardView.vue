@@ -1,15 +1,15 @@
 <template>
   <DashboardLayout v-model:search="search">
-    <div class="flex justify-between items-end mb-8">
+    <div class="flex flex-col gap-4 md:flex-row md:justify-between md:items-end mb-8">
       <div>
-        <h2 class="text-4xl font-bold text-on-surface tracking-tight mb-2">Mis Proyectos</h2>
-        <p class="text-on-surface-variant text-lg">
+        <h2 class="text-2xl md:text-4xl font-bold text-on-surface tracking-tight mb-2">Mis Proyectos</h2>
+        <p class="text-on-surface-variant text-base md:text-lg">
           Tienes {{ projects.length }} proyecto{{ projects.length !== 1 ? 's' : '' }} activo{{ projects.length !== 1 ? 's' : '' }} esta semana.
         </p>
       </div>
       <button
         type="button"
-        class="bg-primary text-on-primary font-bold px-8 py-4 rounded-full flex items-center gap-2 pink-shadow bouncy hover:brightness-110 transition-all"
+        class="hidden md:flex bg-primary text-on-primary font-bold px-8 py-4 rounded-full items-center gap-2 pink-shadow bouncy hover:brightness-110 transition-all"
         @click="openCreateModal"
       >
         <span class="material-symbols-outlined">add</span>
@@ -59,10 +59,10 @@
           <p v-if="deleteError" class="mb-4 text-sm text-error bg-error-container rounded-lg px-4 py-3">
             {{ deleteError }}
           </p>
-          <div class="flex justify-end gap-3">
+          <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <button
               type="button"
-              class="px-5 py-3 rounded-full font-bold text-on-surface-variant hover:bg-surface-variant transition-colors"
+              class="w-full sm:w-auto px-5 py-3 min-h-11 rounded-full font-bold text-on-surface-variant hover:bg-surface-variant transition-colors"
               :disabled="deleting"
               @click="closeDeleteDialog"
             >
@@ -70,7 +70,7 @@
             </button>
             <button
               type="button"
-              class="px-5 py-3 rounded-full font-bold bg-error text-on-error hover:brightness-110 transition-all disabled:opacity-60"
+              class="w-full sm:w-auto px-5 py-3 min-h-11 rounded-full font-bold bg-error text-on-error hover:brightness-110 transition-all disabled:opacity-60"
               :disabled="deleting"
               @click="confirmDelete"
             >
@@ -85,7 +85,7 @@
       <p class="text-sm text-on-surface-variant">© 2024 NariBoard. Keep it sweet.</p>
     </footer>
 
-    <div class="md:hidden fixed bottom-6 right-6 z-50">
+    <div class="md:hidden fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-4 z-50">
       <button
         type="button"
         class="w-16 h-16 bg-primary text-on-primary rounded-full pink-shadow flex items-center justify-center bouncy transition-transform"

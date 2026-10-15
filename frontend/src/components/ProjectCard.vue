@@ -2,7 +2,7 @@
   <router-link
     :to="{ name: 'project-board', params: { projectId: project.id } }"
     class="bg-white rounded-lg purple-shadow border border-outline-variant/30 bouncy flex flex-col justify-between relative overflow-hidden group text-left cursor-pointer no-underline text-inherit"
-    :class="featured ? 'lg:col-span-2 p-8 min-h-[320px]' : 'p-6'"
+    :class="featured ? 'lg:col-span-2 p-5 md:p-8 min-h-0 md:min-h-[320px]' : 'p-6'"
   >
     <div
       v-if="featured"
@@ -15,12 +15,12 @@
         <div class="flex items-center gap-1">
           <button
             type="button"
-            class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm font-bold text-on-surface-variant hover:text-error transition-colors"
+            class="inline-flex items-center justify-center gap-1 rounded-full min-w-11 min-h-11 px-2 text-sm font-bold text-on-surface-variant hover:text-error transition-colors"
             aria-label="Eliminar"
             @click.stop.prevent="emit('delete', project)"
           >
             <span class="material-symbols-outlined text-[20px]">delete</span>
-            Eliminar
+            <span class="hidden sm:inline">Eliminar</span>
           </button>
           <button
             type="button"
@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <component :is="featured ? 'h3' : 'h4'" class="font-bold text-on-surface mb-2" :class="featured ? 'text-3xl' : 'text-xl'">
+      <component :is="featured ? 'h3' : 'h4'" class="font-bold text-on-surface mb-2" :class="featured ? 'text-2xl md:text-3xl' : 'text-xl'">
         {{ project.title }}
       </component>
       <p class="text-on-surface-variant" :class="featured ? 'max-w-md' : 'text-sm'">

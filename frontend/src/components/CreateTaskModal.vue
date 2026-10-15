@@ -133,7 +133,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
     @click.self="requestClose"
   >
     <div
-      class="w-full max-w-lg bg-surface-container-lowest rounded-3xl overflow-hidden tinted-shadow-primary border border-surface-container-highest"
+      class="w-full max-w-lg max-h-[90dvh] overflow-y-auto bg-surface-container-lowest rounded-3xl tinted-shadow-primary border border-surface-container-highest"
       role="dialog"
       aria-modal="true"
       aria-labelledby="task-modal-title"
@@ -144,7 +144,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         </h2>
         <button
           type="button"
-          class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+          class="w-11 h-11 flex items-center justify-center rounded-full material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
           aria-label="Cerrar"
           @click="requestClose"
         >
