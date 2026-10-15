@@ -35,8 +35,51 @@
         :key="project.id"
         :project="project"
         :featured="index === 0"
+        @delete="openDeleteDialog"
       />
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="projectToDelete"
+        class="fixed inset-0 z-[60] flex items-center justify-center bg-on-surface/40 px-4"
+        @click.self="closeDeleteDialog"
+      >
+        <div
+          class="bg-white rounded-lg purple-shadow w-full max-w-md p-8"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-project-title"
+          @keydown.esc="closeDeleteDialog"
+        >
+          <h3 id="delete-project-title" class="text-2xl font-bold text-on-surface mb-2">Eliminar proyecto</h3>
+          <p class="text-on-surface-variant mb-6">
+            ¿Eliminar <span class="font-bold text-on-surface">{{ projectToDelete.title }}</span>? Esta acción es permanente.
+          </p>
+          <p v-if="deleteError" class="mb-4 text-sm text-error bg-error-container rounded-lg px-4 py-3">
+            {{ deleteError }}
+          </p>
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              class="px-5 py-3 rounded-full font-bold text-on-surface-variant hover:bg-surface-variant transition-colors"
+              :disabled="deleting"
+              @click="closeDeleteDialog"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="px-5 py-3 rounded-full font-bold bg-error text-on-error hover:brightness-110 transition-all disabled:opacity-60"
+              :disabled="deleting"
+              @click="confirmDelete"
+            >
+              {{ deleting ? 'Eliminando...' : 'Eliminar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
     <footer class="mt-16 pt-8 border-t border-outline-variant/30 text-center pb-8">
       <p class="text-sm text-on-surface-variant">© 2024 NariBoard. Keep it sweet.</p>
@@ -63,7 +106,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
-import { fetchProjects } from '../services/projectsService'
+import { deleteProject, fetchProjects } from '../services/projectsService'
 import DashboardLayout from '../components/DashboardLayout.vue'
 import ProjectCard from '../components/ProjectCard.vue'
 import CreateProjectModal from '../components/CreateProjectModal.vue'
@@ -75,6 +118,9 @@ const loading = ref(true)
 const error = ref(null)
 const search = ref('')
 const showCreateModal = ref(false)
+const projectToDelete = ref(null)
+const deleting = ref(false)
+const deleteError = ref(null)
 
 const filteredProjects = computed(() => {
   const term = search.value.toLowerCase().trim()
@@ -104,6 +150,37 @@ function openCreateModal() {
 
 async function onProjectCreated() {
   await loadProjects()
+}
+
+function openDeleteDialog(project) {
+  deleteError.value = null
+  projectToDelete.value = project
+}
+
+function closeDeleteDialog() {
+  if (deleting.value) return
+  projectToDelete.value = null
+  deleteError.value = null
+}
+
+async function confirmDelete() {
+  if (!projectToDelete.value || deleting.value) return
+  if (!authStore.session?.access_token) return
+
+  const id = projectToDelete.value.id
+  deleting.value = true
+  deleteError.value = null
+
+  try {
+    await deleteProject(authStore.session.access_token, id)
+    projects.value = projects.value.filter((project) => project.id !== id)
+    deleting.value = false
+    closeDeleteDialog()
+  } catch (err) {
+    deleteError.value = err.message
+  } finally {
+    deleting.value = false
+  }
 }
 
 onMounted(loadProjects)

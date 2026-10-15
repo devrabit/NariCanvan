@@ -13,6 +13,12 @@ const PRIORITY_LABELS = {
 
 const PRIORITIES = new Set(['low', 'medium', 'high'])
 
+export function canDeleteProject(project, user, profile) {
+  if (!project || !user || !profile) return false
+  if (profile.role === 'admin') return true
+  return project.ownerId === user.uid
+}
+
 export function formatProject(project) {
   const ownerId = project.ownerId
   const teamMemberIds = Array.isArray(project.teamMemberIds) && project.teamMemberIds.length

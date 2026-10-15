@@ -1,6 +1,13 @@
-import { createDocument, getDocument, queryCollection } from '../services/firestore.service.js'
+import {
+  createDocument,
+  deleteDocumentByPath,
+  getDocument,
+  listDocumentsAtPath,
+  queryCollection,
+} from '../services/firestore.service.js'
 import {
   buildCreateProjectDocument,
+  canDeleteProject,
   demoProjects,
   formatProject,
   validateCreateProjectPayload,
@@ -93,5 +100,47 @@ export async function getProject(req, res) {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al obtener el proyecto' })
+  }
+}
+
+export async function deleteProject(req, res) {
+  try {
+    const { projectId } = req.params
+    if (!projectId) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' })
+    }
+
+    const project = await getDocument(req.accessToken, 'projects', projectId)
+    if (!project) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' })
+    }
+
+    if (!canDeleteProject(project, req.user, req.profile)) {
+      return res.status(403).json({ error: 'No tienes permiso para eliminar este proyecto' })
+    }
+
+    const tasks = await listDocumentsAtPath(req.accessToken, `projects/${projectId}/tasks`)
+    for (const task of tasks) {
+      try {
+        await deleteDocumentByPath(req.accessToken, `projects/${projectId}/tasks/${task.id}`)
+      } catch (error) {
+        if (error.status === 404) continue
+        throw error
+      }
+    }
+
+    await deleteDocumentByPath(req.accessToken, `projects/${projectId}`)
+    return res.status(204).send()
+  } catch (error) {
+    console.error(error)
+    if (error.status === 404) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' })
+    }
+    const status = error.status === 403 ? 403 : 500
+    return res.status(status).json({
+      error: status === 403
+        ? 'No tienes permiso para eliminar este proyecto'
+        : 'Error al eliminar el proyecto',
+    })
   }
 }

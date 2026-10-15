@@ -152,9 +152,21 @@ export async function createDocumentAtPath(accessToken, collectionPath, data) {
 }
 
 export async function listDocumentsAtPath(accessToken, collectionPath) {
-  const body = await firestoreRequest(accessToken, `/${collectionPath}?pageSize=100`)
-  if (!body) return []
-  return (body.documents || []).map(parseDocument)
+  const documents = []
+  let pageToken = ''
+
+  do {
+    const params = new URLSearchParams({ pageSize: '100' })
+    if (pageToken) params.set('pageToken', pageToken)
+
+    const body = await firestoreRequest(accessToken, `/${collectionPath}?${params}`)
+    if (!body) break
+
+    documents.push(...(body.documents || []).map(parseDocument))
+    pageToken = body.nextPageToken || ''
+  } while (pageToken)
+
+  return documents
 }
 
 export async function patchDocumentByPath(accessToken, documentPath, data) {

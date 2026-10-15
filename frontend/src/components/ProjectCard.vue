@@ -12,13 +12,24 @@
     <div :class="featured ? 'relative z-10' : ''">
       <div class="flex justify-between items-start" :class="featured ? 'mb-6' : 'mb-4'">
         <span :class="badgeClass">{{ project.statusLabel }}</span>
-        <button
-          type="button"
-          class="text-on-surface-variant hover:text-primary transition-colors"
-          @click.prevent
-        >
-          <span class="material-symbols-outlined">{{ statusIcon }}</span>
-        </button>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm font-bold text-on-surface-variant hover:text-error transition-colors"
+            aria-label="Eliminar"
+            @click.stop.prevent="emit('delete', project)"
+          >
+            <span class="material-symbols-outlined text-[20px]">delete</span>
+            Eliminar
+          </button>
+          <button
+            type="button"
+            class="text-on-surface-variant hover:text-primary transition-colors"
+            @click.stop.prevent
+          >
+            <span class="material-symbols-outlined">{{ statusIcon }}</span>
+          </button>
+        </div>
       </div>
 
       <component :is="featured ? 'h3' : 'h4'" class="font-bold text-on-surface mb-2" :class="featured ? 'text-3xl' : 'text-xl'">
@@ -78,6 +89,8 @@ const props = defineProps({
   project: { type: Object, required: true },
   featured: { type: Boolean, default: false },
 })
+
+const emit = defineEmits(['delete'])
 
 const STATUS_CONFIG = {
   in_progress: {

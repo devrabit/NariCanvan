@@ -60,3 +60,16 @@ export async function createProject(accessToken, payload) {
 
   return data
 }
+
+export async function deleteProject(accessToken, projectId) {
+  const token = await getAccessToken(accessToken)
+  const response = await fetch(`${API_URL}/api/projects/${encodeURIComponent(projectId)}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+
+  if (response.status === 204) return
+
+  const data = await response.json().catch(() => ({}))
+  throw new Error(data.error || 'Error al eliminar el proyecto')
+}
