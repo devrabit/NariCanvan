@@ -11,24 +11,24 @@
       <div class="relative">
         <button
           type="button"
-          class="material-symbols-outlined text-sm text-on-surface-variant hover:text-primary transition-colors"
+          class="flex items-center justify-center w-11 h-11 -mr-2 -mt-1 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer"
           aria-label="Opciones de tarea"
           aria-haspopup="menu"
           :aria-expanded="menuOpen"
           @click.stop="toggleMenu"
           @mousedown.stop
         >
-          more_horiz
+          <span class="material-symbols-outlined text-[26px]">more_horiz</span>
         </button>
         <div
           v-if="menuOpen"
-          class="absolute right-0 top-7 z-20 min-w-[140px] rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg py-1 overflow-hidden"
+          class="absolute right-0 top-full mt-1 z-20 min-w-[180px] rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg py-1 overflow-hidden"
           role="menu"
           @click.stop
         >
           <button
             type="button"
-            class="w-full text-left px-4 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+            class="w-full text-left px-4 py-3 min-h-11 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
             role="menuitem"
             @click="onEdit"
           >
@@ -36,7 +36,7 @@
           </button>
           <button
             type="button"
-            class="w-full text-left px-4 py-2 text-sm font-medium text-error hover:bg-error-container transition-colors"
+            class="w-full text-left px-4 py-3 min-h-11 text-sm font-medium text-error hover:bg-error-container transition-colors"
             role="menuitem"
             @click="onDelete"
           >
