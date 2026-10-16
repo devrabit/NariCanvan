@@ -8,7 +8,6 @@ import {
 import { formatProject } from '../services/projects.service.js'
 import {
   buildCreateTaskDocument,
-  demoTasks,
   formatTask,
   validateCreateTaskPayload,
   validatePatchTaskPayload,
@@ -48,15 +47,7 @@ export async function listTasks(req, res) {
     if (!project) return
 
     const collectionPath = `projects/${project.id}/tasks`
-    let tasks = await listDocumentsAtPath(req.accessToken, collectionPath)
-
-    if (!tasks.length) {
-      const seeded = []
-      for (const task of demoTasks(req.user.uid)) {
-        seeded.push(await createDocumentAtPath(req.accessToken, collectionPath, task))
-      }
-      tasks = seeded
-    }
+    const tasks = await listDocumentsAtPath(req.accessToken, collectionPath)
 
     const search = String(req.query.search || '').trim().toLowerCase()
     const filtered = search
