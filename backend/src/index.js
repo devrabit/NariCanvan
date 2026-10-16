@@ -5,6 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.routes.js'
 import projectsRoutes from './routes/projects.routes.js'
+import usersRoutes from './routes/users.routes.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,6 +23,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/projects', projectsRoutes)
+app.use('/api/users', usersRoutes)
 
 app.use(express.static(publicDir))
 

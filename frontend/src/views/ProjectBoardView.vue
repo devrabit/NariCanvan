@@ -27,6 +27,8 @@
       </p>
       <KanbanBoard
         :tasks="filteredTasks"
+        :project-id="String(route.params.projectId || '')"
+        :users="users"
         @create="openCreate"
         @drop="onDrop"
         @dragstart="draggingTask = $event"
@@ -34,6 +36,7 @@
         @edit="openEdit"
         @delete="onDeleteTask"
         @move="onMove"
+        @assigned="onTaskUpdated"
       />
     </div>
 
@@ -64,6 +67,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { fetchProject } from '../services/projectsService'
 import { deleteTask, fetchTasks, patchTask } from '../services/tasksService'
+import { fetchUsers } from '../services/usersService'
 import DashboardLayout from '../components/DashboardLayout.vue'
 import KanbanBoard from '../components/KanbanBoard.vue'
 import CreateTaskModal from '../components/CreateTaskModal.vue'
@@ -73,6 +77,7 @@ const authStore = useAuthStore()
 
 const project = ref(null)
 const tasks = ref([])
+const users = ref([])
 const loading = ref(true)
 const error = ref(null)
 const search = ref('')
@@ -96,12 +101,14 @@ async function loadBoard() {
   try {
     const token = authStore.session.access_token
     const projectId = route.params.projectId
-    const [projectData, tasksData] = await Promise.all([
+    const [projectData, tasksData, usersData] = await Promise.all([
       fetchProject(token, projectId),
       fetchTasks(token, projectId),
+      fetchUsers(token).catch(() => ({ users: [] })),
     ])
     project.value = projectData.project
     tasks.value = tasksData.tasks
+    users.value = usersData.users || []
   } catch (err) {
     error.value = err.message
     project.value = null

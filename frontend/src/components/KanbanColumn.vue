@@ -29,11 +29,14 @@
         v-for="task in tasks"
         :key="task.id"
         :task="task"
+        :project-id="projectId"
+        :users="users"
         @dragstart="$emit('dragstart', $event)"
         @dragend="$emit('dragend')"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
         @move="$emit('move', $event)"
+        @assigned="$emit('assigned', $event)"
       />
     </div>
   </div>
@@ -46,9 +49,11 @@ import TaskCard from './TaskCard.vue'
 const props = defineProps({
   column: { type: Object, required: true },
   tasks: { type: Array, default: () => [] },
+  projectId: { type: String, required: true },
+  users: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete', 'move'])
+const emit = defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete', 'move', 'assigned'])
 
 const isOver = ref(false)
 

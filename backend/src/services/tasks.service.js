@@ -113,6 +113,33 @@ export function validatePatchTaskPayload(body = {}) {
     }
   }
 
+  if (body.assigneeIds !== undefined) {
+    const ids = []
+    const seen = new Set()
+    let invalid = !Array.isArray(body.assigneeIds)
+    if (!invalid) {
+      for (const id of body.assigneeIds) {
+        if (typeof id !== 'string') {
+          invalid = true
+          break
+        }
+        const trimmed = id.trim()
+        if (!trimmed || trimmed.length > 128) {
+          invalid = true
+          break
+        }
+        if (seen.has(trimmed)) continue
+        seen.add(trimmed)
+        ids.push(trimmed)
+      }
+    }
+    if (invalid || ids.length < 1 || ids.length > 20) {
+      fields.assigneeIds = 'Debe haber entre 1 y 20 responsables'
+    } else {
+      data.assigneeIds = ids
+    }
+  }
+
   if (!Object.keys(data).length) {
     fields.status = 'No hay campos para actualizar'
   }

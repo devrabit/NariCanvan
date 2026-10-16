@@ -8,7 +8,7 @@ service cloud.firestore {
     // Collection: users
     // Document ID: Firebase Auth UID
     // Fields:
-    //   - email: string (required, valid email, max 320) - PII, owner-only read
+    //   - email: string (required, valid email, max 320) - readable by any signed-in user when isActive
     //   - fullName: string (optional, max 120)
     //   - role: string (required, 'admin' | 'cashier') - immutable via client
     //   - isActive: bool (required) - immutable via client
@@ -163,7 +163,8 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId)
+        || (isAuthenticated() && resource.data.isActive == true);
 
       allow create: if isOwner(userId)
         && isValidUser(request.resource.data)

@@ -84,11 +84,12 @@
         <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">bolt</span>
         <span class="text-[10px] font-black tracking-tighter">AHORA</span>
       </div>
-      <div
-        class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold text-on-secondary-container border-2 border-white"
-      >
-        {{ assigneeInitial }}
-      </div>
+      <TaskAssigneeButton
+        :task="task"
+        :project-id="projectId"
+        :users="users"
+        @assigned="$emit('assigned', $event)"
+      />
     </div>
   </article>
 </template>
@@ -96,12 +97,15 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { formatShortDate } from '../utils/formatDate'
+import TaskAssigneeButton from './TaskAssigneeButton.vue'
 
 const props = defineProps({
   task: { type: Object, required: true },
+  projectId: { type: String, required: true },
+  users: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['dragstart', 'dragend', 'edit', 'delete', 'move'])
+const emit = defineEmits(['dragstart', 'dragend', 'edit', 'delete', 'move', 'assigned'])
 
 const MOVE_TARGETS = [
   { status: 'pending', label: 'Pendiente' },
@@ -125,11 +129,6 @@ const priorityClass = computed(() => {
 })
 
 const moveTargets = computed(() => MOVE_TARGETS.filter((item) => item.status !== props.task.status))
-
-const assigneeInitial = computed(() => {
-  const id = props.task.assigneeIds?.[0] || props.task.createdBy || '?'
-  return String(id).slice(0, 2).toUpperCase()
-})
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value

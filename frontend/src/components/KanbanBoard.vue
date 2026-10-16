@@ -6,6 +6,8 @@
         :key="column.status"
         :column="column"
         :tasks="tasksByStatus[column.status] || []"
+        :project-id="projectId"
+        :users="users"
         @create="$emit('create', $event)"
         @drop="$emit('drop', $event)"
         @dragstart="$emit('dragstart', $event)"
@@ -13,6 +15,7 @@
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
         @move="$emit('move', $event)"
+        @assigned="$emit('assigned', $event)"
       />
     </div>
   </section>
@@ -24,9 +27,11 @@ import KanbanColumn from './KanbanColumn.vue'
 
 const props = defineProps({
   tasks: { type: Array, default: () => [] },
+  projectId: { type: String, required: true },
+  users: { type: Array, default: () => [] },
 })
 
-defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete', 'move'])
+defineEmits(['create', 'drop', 'dragstart', 'dragend', 'edit', 'delete', 'move', 'assigned'])
 
 const columns = [
   { status: 'pending', label: 'Pendiente' },
