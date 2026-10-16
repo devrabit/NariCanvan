@@ -26,9 +26,10 @@
       <span class="material-symbols-outlined text-base text-primary">person_add</span>
     </button>
 
+    <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-on-surface/40"
+      class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-on-surface/40"
       @click.self="close"
     >
       <div
@@ -43,7 +44,7 @@
             type="button"
             class="w-11 h-11 flex items-center justify-center rounded-full material-symbols-outlined text-on-surface-variant hover:text-primary"
             aria-label="Cerrar"
-            @click="close"
+            @click="close(true)"
           >
             close
           </button>
@@ -88,6 +89,7 @@
         </p>
       </div>
     </div>
+    </Teleport>
   </div>
 </template>
 
@@ -108,6 +110,7 @@ const authStore = useAuthStore()
 const open = ref(false)
 const saving = ref(false)
 const error = ref(null)
+const openedAt = ref(0)
 
 const assigneeIds = computed(() => {
   const ids = props.task.assigneeIds
@@ -145,12 +148,15 @@ function isAssigned(id) {
 }
 
 function toggle() {
+  if (open.value) return
   error.value = null
-  open.value = !open.value
+  openedAt.value = Date.now()
+  open.value = true
 }
 
-function close() {
+function close(force = false) {
   if (saving.value) return
+  if (!force && Date.now() - openedAt.value < 300) return
   open.value = false
 }
 
@@ -187,7 +193,7 @@ async function toggleUser(user) {
 }
 
 function onKeydown(event) {
-  if (event.key === 'Escape' && open.value) close()
+  if (event.key === 'Escape' && open.value) close(true)
 }
 
 onMounted(() => window.addEventListener('keydown', onKeydown))
